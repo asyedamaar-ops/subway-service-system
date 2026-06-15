@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}About — SubwaySSC{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="container" style="max-width:800px">
+    <div class="section-title">About SubwaySSC</div>
+    <div class="section-sub">Subway Service Corporation System</div>
+    <div class="card mb-4">
+      <div class="card-body">
+        <p>The <strong>Subway Service Corporation System (SSCS)</strong> is a full-stack web application built as a Database Management Systems project at SRM Institute of Science and Technology, Chennai.</p>
+        <p>It addresses real-world challenges in urban metro systems — cumbersome ticketing, lack of operational transparency, and inefficient resource allocation — by providing a comprehensive management platform for both passengers and operators.</p>
+        <h5 class="mt-4" style="color:var(--accent)">Technical Stack</h5>
+        <ul>
+          <li>Backend: <strong>Python Flask</strong> with SQLAlchemy ORM</li>
+          <li>Database: <strong>MySQL</strong> — normalized to 3NF/BCNF</li>
+          <li>Frontend: Custom dark-theme CSS + Bootstrap 5</li>
+          <li>Auth: Flask-Login with Werkzeug password hashing</li>
+          <li>DB Features: Triggers, views, constraints, concurrency control</li>
+        </ul>
+        <h5 class="mt-4" style="color:var(--accent)">Project Report</h5>
+        <p>The complete project report covering ER design, relational schema, normalization (1NF–5NF), complex SQL queries, triggers, and concurrency control mechanisms is available in the repository.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h5 style="color:var(--accent)">Team</h5>
+        <div class="row g-3 mt-1">
+          <div class="col-md-6">
+            <div style="font-weight:700">Syed Amaar Andrabi</div>
+            <div style="color:var(--text-muted);font-size:0.85rem">RA2311026010439 · SRM IST Chennai</div>
+          </div>
+          <div class="col-md-6">
+            <div style="font-weight:700">Devdarsh Singh</div>
+            <div style="color:var(--text-muted);font-size:0.85rem">RA2311026010443 · SRM IST Chennai</div>
+          </div>
+        </div>
+        <div class="mt-3" style="color:var(--text-muted);font-size:0.85rem">
+          Under the guidance of Dr. A. Sheryl Oliver, Department of CINTEL, SRMIST-KTR
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

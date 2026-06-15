@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}SubwaySSC — Smart Metro Ticketing{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container position-relative">
+    <div class="hero-badge">🚇 Chennai Metro · Blue Line · Green Line</div>
+    <h1>Smarter Journeys<br>Start Here</h1>
+    <p class="lead">Book metro tickets instantly, manage your travel, and get real-time seat availability — all in one place.</p>
+
+    <!-- Search Card -->
+    <div class="search-card">
+      <form action="{{ url_for('main.search') }}" method="GET">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">From Station</label>
+            <select name="origin" class="form-select" required>
+              <option value="">Select Origin</option>
+              {% for s in stations %}
+                <option value="{{ s.station_id }}">{{ s.name }} ({{ s.code }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">To Station</label>
+            <select name="destination" class="form-select" required>
+              <option value="">Select Destination</option>
+              {% for s in stations %}
+                <option value="{{ s.station_id }}">{{ s.name }} ({{ s.code }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Travel Date</label>
+            <input type="date" name="date" class="form-control" required
+                   min="{{ now.strftime('%Y-%m-%d') if now else '' }}">
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              🔍 Find Trains
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon purple">🚇</div>
+          <div>
+            <div class="stat-value">{{ total_metros }}</div>
+            <div class="stat-label">Metro Lines</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon green">🚉</div>
+          <div>
+            <div class="stat-value">{{ total_stations }}</div>
+            <div class="stat-label">Stations</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon orange">📅</div>
+          <div>
+            <div class="stat-value">{{ total_schedules }}</div>
+            <div class="stat-label">Upcoming Trips</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-title">Why SubwaySSC?</div>
+      <div class="section-sub">Everything you need for a smooth metro experience</div>
+    </div>
+    <div class="row g-4">
+      {% set features = [
+        ('⚡', 'Instant Booking', 'Book tickets in seconds with live seat availability and instant confirmation.'),
+        ('🎫', 'Smart Waitlist', 'Auto-added to waitlist when full. Promoted automatically when a seat opens.'),
+        ('💳', 'Multiple Payments', 'Pay via UPI, card, or netbanking. Secure and instant.'),
+        ('📊', 'Live Dashboard', 'Admins get real-time analytics — revenue, passengers, seat utilization.'),
+        ('🔒', 'Secure Access', 'Role-based access for passengers and admins. JWT-secured sessions.'),
+        ('📱', 'Mobile Friendly', 'Fully responsive — book from your phone, tablet, or desktop.'),
+      ] %}
+      {% for icon, title, desc in features %}
+        <div class="col-md-4">
+          <div class="card h-100" style="padding:1.5rem">
+            <div style="font-size:2rem;margin-bottom:0.8rem">{{ icon }}</div>
+            <div style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">{{ title }}</div>
+            <div style="color:var(--text-muted);font-size:0.88rem">{{ desc }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5" style="background:var(--bg-card);border-top:1px solid var(--border)">
+  <div class="container text-center">
+    <h2 style="font-weight:800;margin-bottom:0.8rem">Ready to travel smarter?</h2>
+    <p style="color:var(--text-muted);margin-bottom:2rem">Create your account and book your first trip in under a minute.</p>
+    {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-3">Get Started Free</a>
+      <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-lg">Browse Schedules</a>
+    {% else %}
+      <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-lg">Book a Ticket Now</a>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+// Set min date for search form
+document.addEventListener('DOMContentLoaded', () => {
+  const dateInput = document.querySelector('input[type="date"]');
+  if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

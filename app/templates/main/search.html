@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Search Trains — SubwaySSC{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="section-title">Find Trains</div>
+    <div class="section-sub">Search available schedules between stations</div>
+
+    <!-- Search bar -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <form action="{{ url_for('main.search') }}" method="GET">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label">From</label>
+              <select name="origin" class="form-select">
+                <option value="">Select Origin</option>
+                {% for s in stations %}
+                  <option value="{{ s.station_id }}" {% if s.station_id == selected_origin %}selected{% endif %}>
+                    {{ s.name }} ({{ s.code }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">To</label>
+              <select name="destination" class="form-select">
+                <option value="">Select Destination</option>
+                {% for s in stations %}
+                  <option value="{{ s.station_id }}" {% if s.station_id == selected_dest %}selected{% endif %}>
+                    {{ s.name }} ({{ s.code }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Date</label>
+              <input type="date" name="date" class="form-control" value="{{ selected_date }}">
+            </div>
+            <div class="col-md-3">
+              <button type="submit" class="btn btn-primary w-100">🔍 Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Results -->
+    {% if selected_origin and selected_dest and selected_date %}
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div style="font-weight:600">{{ schedules|length }} train(s) found</div>
+        <div style="color:var(--text-muted);font-size:0.85rem">{{ selected_date }}</div>
+      </div>
+
+      {% if schedules %}
+        {% for s in schedules %}
+          <div class="schedule-card">
+            <div class="route-display">
+              <div class="station-label">
+                <div class="station-code">{{ s.source_station.code }}</div>
+                <div class="station-name">{{ s.source_station.name }}</div>
+              </div>
+              <div>
+                <div class="route-arrow">→</div>
+                <div class="time-display">
+                  <div class="time-value">
+                    {{ s.departure_time.strftime('%H:%M') if s.departure_time else '—' }}
+                  </div>
+                  <div>Departs</div>
+                </div>
+              </div>
+              <div class="station-label">
+                <div class="station-code">{{ s.dest_station.code }}</div>
+                <div class="station-name">{{ s.dest_station.name }}</div>
+              </div>
+            </div>
+            <div class="text-center">
+              <div style="font-size:0.78rem;color:var(--text-muted)">Arrives</div>
+              <div class="time-value">
+                {{ s.arrival_time.strftime('%H:%M') if s.arrival_time else '—' }}
+              </div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">
+                {{ s.metro.name }}
+              </div>
+            </div>
+            <div class="text-center">
+              <div style="font-size:0.78rem;color:var(--text-muted)">Seats</div>
+              <div>
+                <span class="status-badge {% if s.available_seats('economy') > 0 %}status-confirmed{% else %}status-cancelled{% endif %}">
+                  Eco: {{ s.available_seats('economy') }}
+                </span>
+              </div>
+              <div class="mt-1">
+                <span class="status-badge {% if s.available_seats('business') > 0 %}status-confirmed{% else %}status-cancelled{% endif %}">
+                  Biz: {{ s.available_seats('business') }}
+                </span>
+              </div>
+            </div>
+            <div class="text-center">
+              <div style="font-size:0.88rem;color:var(--text-muted)">From</div>
+              <div style="font-size:1.5rem;font-weight:900;color:var(--accent)">
+                ₹{{ s.economy_fare }}
+              </div>
+              <a href="{{ url_for('booking.select', schedule_id=s.schedule_id) }}"
+                 class="btn btn-primary mt-2">Book Now</a>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center py-5">
+          <div style="font-size:4rem">🚇</div>
+          <div style="font-size:1.1rem;font-weight:600;margin:1rem 0">No trains found</div>
+          <div style="color:var(--text-muted)">Try a different date or route.</div>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="text-center py-5">
+        <div style="font-size:4rem">🔍</div>
+        <div style="font-size:1.1rem;font-weight:600;margin:1rem 0">Search for trains above</div>
+        <div style="color:var(--text-muted)">Select origin, destination and date to see available schedules.</div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
