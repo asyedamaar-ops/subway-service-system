@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Payment — SubwaySSC{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Order Summary -->
+      <div class="col-md-5 order-md-2">
+        <div class="card" style="position:sticky;top:80px">
+          <div class="card-header">
+            <div class="card-title mb-0">Order Summary</div>
+          </div>
+          <div class="card-body">
+            <div class="ticket-row">
+              <span class="ticket-label">From</span>
+              <span class="ticket-value">{{ schedule.source_station.name }}</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-label">To</span>
+              <span class="ticket-value">{{ schedule.dest_station.name }}</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-label">Date</span>
+              <span class="ticket-value">{{ schedule.travel_date.strftime('%d %b %Y') }}</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-label">Departure</span>
+              <span class="ticket-value">{{ schedule.departure_time.strftime('%H:%M') }}</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-label">Class</span>
+              <span class="ticket-value">{{ seat_type.replace('_', ' ').title() }}</span>
+            </div>
+            <div class="ticket-row">
+              <span class="ticket-label">Available</span>
+              <span class="ticket-value text-success-custom">{{ avail }} seats</span>
+            </div>
+            <hr class="ticket-divider">
+            <div class="ticket-row">
+              <span class="ticket-label" style="font-size:1rem;font-weight:700">Total</span>
+              <span style="font-size:1.5rem;font-weight:900;color:var(--accent)">₹{{ fare | int }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Form -->
+      <div class="col-md-7 order-md-1">
+        <div class="section-title">Complete Payment</div>
+        <div class="section-sub">Secure payment powered by SubwaySSC</div>
+        <form method="POST">
+          <div class="card mb-4">
+            <div class="card-header"><div class="card-title mb-0">Choose Payment Method</div></div>
+            <div class="card-body">
+              <label class="payment-method" id="pm-upi">
+                <input type="radio" name="pay_method" value="upi" checked onchange="updateMethod(this)">
+                <div class="payment-logo">📱</div>
+                <div>
+                  <div style="font-weight:700">UPI</div>
+                  <div style="font-size:0.8rem;color:var(--text-muted)">Google Pay, PhonePe, Paytm</div>
+                </div>
+              </label>
+              <label class="payment-method" id="pm-card">
+                <input type="radio" name="pay_method" value="card" onchange="updateMethod(this)">
+                <div class="payment-logo">💳</div>
+                <div>
+                  <div style="font-weight:700">Debit / Credit Card</div>
+                  <div style="font-size:0.8rem;color:var(--text-muted)">Visa, Mastercard, RuPay</div>
+                </div>
+              </label>
+              <label class="payment-method" id="pm-netbanking">
+                <input type="radio" name="pay_method" value="netbanking" onchange="updateMethod(this)">
+                <div class="payment-logo">🏦</div>
+                <div>
+                  <div style="font-weight:700">Net Banking</div>
+                  <div style="font-size:0.8rem;color:var(--text-muted)">SBI, HDFC, ICICI, Axis</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- UPI Input -->
+          <div id="upi-form" class="card mb-4">
+            <div class="card-body">
+              <label class="form-label">UPI ID</label>
+              <div class="input-group">
+                <span class="input-group-text">@</span>
+                <input type="text" class="form-control" placeholder="yourname@upi" value="demo@upi">
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Input (hidden by default) -->
+          <div id="card-form" class="card mb-4 d-none">
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label">Card Number</label>
+                <input type="text" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+              </div>
+              <div class="row g-3">
+                <div class="col-6">
+                  <label class="form-label">Expiry</label>
+                  <input type="text" class="form-control" placeholder="MM/YY" maxlength="5">
+                </div>
+                <div class="col-6">
+                  <label class="form-label">CVV</label>
+                  <input type="password" class="form-control" placeholder="•••" maxlength="3">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100" id="pay-btn">
+            💳 Pay ₹{{ fare | int }} Securely
+          </button>
+          <div class="text-center mt-3" style="color:var(--text-muted);font-size:0.8rem">
+            🔒 256-bit SSL encrypted · By proceeding you agree to our Terms of Service
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function updateMethod(radio) {
+  document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+  radio.closest('.payment-method').classList.add('selected');
+  document.getElementById('upi-form').classList.add('d-none');
+  document.getElementById('card-form').classList.add('d-none');
+  if (radio.value === 'upi') document.getElementById('upi-form').classList.remove('d-none');
+  if (radio.value === 'card') document.getElementById('card-form').classList.remove('d-none');
+}
+document.querySelector('[value="upi"]').closest('.payment-method').classList.add('selected');
+</script>
+{% endblock %}
