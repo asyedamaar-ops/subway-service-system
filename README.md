@@ -99,9 +99,4 @@ subway/
 - The waitlist promotion trigger in schema.sql has a minor issue with the fare lookup — the app-level version in booking.py works correctly though
 - Mobile layout could be better on very small screens
 
-## Academic context
 
-Course: 21CSC205P Database Management Systems  
-Guide: Dr. A. Sheryl Oliver, Dept. of CINTEL, SRMIST-KTR  
-Team: Syed Amaar Andrabi (RA2311026010439), Devdarsh Singh (RA2311026010443)  
-Year: 2024-25
