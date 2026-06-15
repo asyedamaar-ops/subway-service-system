@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}My Bookings — SubwaySSC{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="section-title">My Bookings</div>
+    <div class="section-sub">Your travel history and upcoming trips</div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" style="border-color:var(--border)">
+      <li class="nav-item">
+        <a class="nav-link active" href="#bookings" data-bs-toggle="tab"
+           style="color:var(--text-muted);border-color:transparent">
+          🎫 Bookings ({{ bookings|length }})
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#waitlist" data-bs-toggle="tab"
+           style="color:var(--text-muted);border-color:transparent">
+          ⏳ Waitlist ({{ waitlists|length }})
+        </a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- BOOKINGS TAB -->
+      <div class="tab-pane fade show active" id="bookings">
+        {% if bookings %}
+          {% for b in bookings %}
+            <div class="schedule-card" style="flex-wrap:wrap">
+              <div>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">
+                  {{ b.booking_time.strftime('%d %b %Y, %H:%M') }}
+                </div>
+                <div style="font-weight:800;font-size:1.1rem">{{ b.ticket_no }}</div>
+                <div style="color:var(--text-muted);font-size:0.85rem;margin-top:2px">
+                  {{ b.schedule.metro.name }}
+                </div>
+              </div>
+              <div class="route-display">
+                <div class="station-label">
+                  <div class="station-code" style="font-size:1.2rem">{{ b.schedule.source_station.code }}</div>
+                  <div class="station-name">{{ b.schedule.source_station.name }}</div>
+                </div>
+                <div style="color:var(--text-muted);font-size:1.2rem">→</div>
+                <div class="station-label">
+                  <div class="station-code" style="font-size:1.2rem">{{ b.schedule.dest_station.code }}</div>
+                  <div class="station-name">{{ b.schedule.dest_station.name }}</div>
+                </div>
+              </div>
+              <div class="text-center">
+                <div style="font-size:0.78rem;color:var(--text-muted)">Date</div>
+                <div style="font-weight:600">{{ b.schedule.travel_date.strftime('%d %b %Y') }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted)">
+                  {{ b.schedule.departure_time.strftime('%H:%M') }}
+                </div>
+              </div>
+              <div class="text-center">
+                <div style="font-size:0.78rem;color:var(--text-muted)">Class · Seat</div>
+                <div style="font-weight:600">{{ b.seat_type.replace('_',' ').title() }}</div>
+                <div style="font-size:0.85rem;color:var(--accent)">{{ b.seat_number }}</div>
+              </div>
+              <div class="text-center">
+                <div style="font-size:1.2rem;font-weight:900;color:var(--accent)">₹{{ b.total_fare | int }}</div>
+                <span class="status-badge status-{{ b.status.value }}">{{ b.status.value }}</span>
+              </div>
+              <div>
+                {% if b.status.value == 'confirmed' %}
+                  <form method="POST" action="{{ url_for('booking.cancel', booking_id=b.booking_id) }}"
+                        onsubmit="return confirm('Cancel this booking?')">
+                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                  </form>
+                {% endif %}
+                <a href="{{ url_for('booking.confirmation', booking_id=b.booking_id) }}"
+                   class="btn btn-outline-primary btn-sm mt-1">View</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div style="font-size:4rem">🎫</div>
+            <div style="font-size:1.1rem;font-weight:600;margin:1rem 0">No bookings yet</div>
+            <a href="{{ url_for('main.search') }}" class="btn btn-primary">Book Your First Trip</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- WAITLIST TAB -->
+      <div class="tab-pane fade" id="waitlist">
+        {% if waitlists %}
+          {% for w in waitlists %}
+            <div class="schedule-card">
+              <div>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">
+                  Requested {{ w.request_time.strftime('%d %b %Y') }}
+                </div>
+                <div style="font-weight:700">{{ w.schedule.source_station.name }} → {{ w.schedule.dest_station.name }}</div>
+                <div style="color:var(--text-muted);font-size:0.85rem">{{ w.seat_type.replace('_',' ').title() }}</div>
+              </div>
+              <div class="text-center">
+                <div style="font-size:0.78rem;color:var(--text-muted)">Date</div>
+                <div style="font-weight:600">{{ w.schedule.travel_date.strftime('%d %b %Y') }}</div>
+              </div>
+              <div class="text-center">
+                <div style="font-size:0.78rem;color:var(--text-muted)">Position</div>
+                <div style="font-size:2rem;font-weight:900;color:var(--warning)">#{{ w.position }}</div>
+              </div>
+              <span class="status-badge status-waitlisted">Waitlisted</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div style="font-size:4rem">⏳</div>
+            <div style="font-size:1.1rem;font-weight:600;margin:1rem 0">No waitlist entries</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// Activate correct tab styling
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('shown.bs.tab', e => {
+    document.querySelectorAll('.nav-link').forEach(l => l.style.color = 'var(--text-muted)');
+    e.target.style.color = 'var(--accent)';
+    e.target.style.borderBottomColor = 'var(--accent)';
+  });
+});
+</script>
+{% endblock %}

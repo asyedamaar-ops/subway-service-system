@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Booking Confirmed — SubwaySSC{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="text-center mb-4">
+      <div class="confirm-badge">✓</div>
+      <h2 style="font-weight:800">Booking Confirmed!</h2>
+      <p style="color:var(--text-muted)">Your ticket has been booked successfully. Safe travels!</p>
+    </div>
+
+    <div class="ticket-card">
+      <div class="ticket-header">
+        <div style="font-size:0.82rem;letter-spacing:1px;text-transform:uppercase;opacity:0.8">SubwaySSC Ticket</div>
+        <div style="font-size:1.4rem;font-weight:900;margin:0.4rem 0">{{ booking.ticket_no }}</div>
+        <span class="status-badge status-confirmed">Confirmed</span>
+      </div>
+      <div class="ticket-body">
+        <div class="row g-3 mb-3">
+          <div class="col-5 text-center">
+            <div class="station-code">{{ booking.schedule.source_station.code }}</div>
+            <div class="station-name">{{ booking.schedule.source_station.name }}</div>
+            <div style="font-size:1.1rem;font-weight:700;margin-top:4px">
+              {{ booking.schedule.departure_time.strftime('%H:%M') }}
+            </div>
+          </div>
+          <div class="col-2 text-center" style="padding-top:1rem">
+            <div style="color:var(--text-muted)">→</div>
+          </div>
+          <div class="col-5 text-center">
+            <div class="station-code">{{ booking.schedule.dest_station.code }}</div>
+            <div class="station-name">{{ booking.schedule.dest_station.name }}</div>
+            <div style="font-size:1.1rem;font-weight:700;margin-top:4px">
+              {{ booking.schedule.arrival_time.strftime('%H:%M') }}
+            </div>
+          </div>
+        </div>
+        <hr class="ticket-divider">
+        <div class="ticket-row">
+          <span class="ticket-label">Passenger</span>
+          <span class="ticket-value">{{ booking.passenger.passenger_name }}</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Date</span>
+          <span class="ticket-value">{{ booking.schedule.travel_date.strftime('%d %b %Y') }}</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Class</span>
+          <span class="ticket-value">{{ booking.seat_type.replace('_',' ').title() }}</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Seat</span>
+          <span class="ticket-value">{{ booking.seat_number }}</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Metro</span>
+          <span class="ticket-value">{{ booking.schedule.metro.name }}</span>
+        </div>
+        <hr class="ticket-divider">
+        <div class="ticket-row">
+          <span class="ticket-label">Fare Paid</span>
+          <span style="font-size:1.4rem;font-weight:900;color:var(--accent)">₹{{ booking.total_fare | int }}</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Payment</span>
+          <span class="ticket-value">{{ booking.payment_method.upper() }}</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Transaction ID</span>
+          <span class="ticket-value" style="font-size:0.82rem">{{ booking.transaction_id }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4 d-flex gap-3 justify-content-center flex-wrap">
+      <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary">Book Another Ticket</a>
+      <a href="{{ url_for('booking.my_bookings') }}" class="btn btn-primary">View All Bookings</a>
+    </div>
+    <div class="text-center mt-3" style="color:var(--text-muted);font-size:0.82rem">
+      Please arrive at the station 15 minutes before departure. Show this confirmation at the counter.
+    </div>
+  </div>
+</div>
+{% endblock %}
