@@ -1,0 +1,34 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Schedules — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><div class="section-title">Schedules</div><div class="section-sub">Manage train schedules</div></div>
+  <a href="{{ url_for('admin.add_schedule') }}" class="btn btn-primary">+ Add Schedule</a>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead><tr><th>ID</th><th>Metro</th><th>From</th><th>To</th><th>Date</th><th>Departs</th><th>Arrives</th><th>Eco Fare</th><th>Biz Fare</th></tr></thead>
+        <tbody>
+          {% for s in schedules %}
+            <tr>
+              <td>{{ s.schedule_id }}</td>
+              <td style="font-weight:600">{{ s.metro.name }}</td>
+              <td>{{ s.source_station.name }} <span style="color:var(--text-muted)">({{ s.source_station.code }})</span></td>
+              <td>{{ s.dest_station.name }} <span style="color:var(--text-muted)">({{ s.dest_station.code }})</span></td>
+              <td>{{ s.travel_date.strftime('%d %b %Y') }}</td>
+              <td>{{ s.departure_time.strftime('%H:%M') }}</td>
+              <td>{{ s.arrival_time.strftime('%H:%M') }}</td>
+              <td style="color:var(--accent)">₹{{ s.economy_fare | int }}</td>
+              <td style="color:var(--accent)">₹{{ s.business_fare | int }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="9" class="text-center" style="color:var(--text-muted)">No schedules yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

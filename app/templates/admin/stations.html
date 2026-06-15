@@ -1,0 +1,30 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Stations — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><div class="section-title">Stations</div><div class="section-sub">Manage metro stations</div></div>
+  <a href="{{ url_for('admin.add_station') }}" class="btn btn-primary">+ Add Station</a>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>ID</th><th>Name</th><th>Code</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in stations %}
+          <tr>
+            <td>{{ s.station_id }}</td>
+            <td style="font-weight:600">{{ s.name }}</td>
+            <td><span class="status-badge status-confirmed">{{ s.code }}</span></td>
+            <td style="color:var(--text-muted)">{{ s.location or '—' }}</td>
+            <td><span class="status-badge {% if s.is_active %}status-confirmed{% else %}status-cancelled{% endif %}">
+              {% if s.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+            <td><a href="{{ url_for('admin.edit_station', station_id=s.station_id) }}" class="btn btn-outline-primary btn-sm">Edit</a></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-center" style="color:var(--text-muted)">No stations yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

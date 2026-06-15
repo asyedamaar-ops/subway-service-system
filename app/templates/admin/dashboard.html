@@ -1,0 +1,148 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Admin Dashboard — SubwaySSC{% endblock %}
+{% block admin_content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <div class="section-title">Dashboard</div>
+    <div class="section-sub">Welcome back, {{ current_user.username }} 👋</div>
+  </div>
+  <div style="color:var(--text-muted);font-size:0.85rem">
+    {{ now.strftime('%d %b %Y, %H:%M') if now else '' }}
+  </div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon purple">🎫</div>
+      <div>
+        <div class="stat-value">{{ stats.total_bookings }}</div>
+        <div class="stat-label">Total Bookings</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon green">✅</div>
+      <div>
+        <div class="stat-value">{{ stats.confirmed }}</div>
+        <div class="stat-label">Confirmed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon red">❌</div>
+      <div>
+        <div class="stat-value">{{ stats.cancelled }}</div>
+        <div class="stat-label">Cancelled</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon orange">⏳</div>
+      <div>
+        <div class="stat-value">{{ stats.waitlisted }}</div>
+        <div class="stat-label">Waitlisted</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon green">💰</div>
+      <div>
+        <div class="stat-value">₹{{ stats.revenue | int }}</div>
+        <div class="stat-label">Total Revenue</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon purple">👥</div>
+      <div>
+        <div class="stat-value">{{ stats.total_passengers }}</div>
+        <div class="stat-label">Passengers</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon orange">🚇</div>
+      <div>
+        <div class="stat-value">{{ stats.total_metros }}</div>
+        <div class="stat-label">Metro Lines</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-icon green">📅</div>
+      <div>
+        <div class="stat-value">{{ stats.total_schedules }}</div>
+        <div class="stat-label">Schedules</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECENT BOOKINGS -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-title mb-0">Recent Bookings</div>
+    <a href="{{ url_for('admin.bookings') }}" class="btn btn-outline-primary btn-sm">View All</a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Ticket No</th>
+            <th>Passenger</th>
+            <th>Route</th>
+            <th>Date</th>
+            <th>Class</th>
+            <th>Fare</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in recent_bookings %}
+            <tr>
+              <td style="font-weight:600;color:var(--accent)">{{ b.ticket_no }}</td>
+              <td>{{ b.passenger.passenger_name }}</td>
+              <td>{{ b.schedule.source_station.code }} → {{ b.schedule.dest_station.code }}</td>
+              <td>{{ b.schedule.travel_date.strftime('%d %b') }}</td>
+              <td>{{ b.seat_type.replace('_',' ').title() }}</td>
+              <td>₹{{ b.total_fare | int }}</td>
+              <td><span class="status-badge status-{{ b.status.value }}">{{ b.status.value }}</span></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="text-center" style="color:var(--text-muted)">No bookings yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="row g-3 mt-2">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header"><div class="card-title mb-0">Quick Actions</div></div>
+      <div class="card-body d-flex gap-3 flex-wrap">
+        <a href="{{ url_for('admin.add_metro') }}" class="btn btn-outline-primary">+ Add Metro</a>
+        <a href="{{ url_for('admin.add_station') }}" class="btn btn-outline-primary">+ Add Station</a>
+        <a href="{{ url_for('admin.add_schedule') }}" class="btn btn-outline-primary">+ Add Schedule</a>
+        <a href="{{ url_for('admin.waitlist') }}" class="btn btn-outline-primary">View Waitlist</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

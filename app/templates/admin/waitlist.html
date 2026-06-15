@@ -1,0 +1,27 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Waitlist — Admin{% endblock %}
+{% block admin_content %}
+<div class="section-title mb-1">Waitlist</div>
+<div class="section-sub">{{ waitlist|length }} passengers waiting</div>
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>Position</th><th>Passenger</th><th>Route</th><th>Date</th><th>Class</th><th>Requested</th></tr></thead>
+      <tbody>
+        {% for w in waitlist %}
+          <tr>
+            <td><span style="font-size:1.3rem;font-weight:900;color:var(--warning)">#{{ w.position }}</span></td>
+            <td style="font-weight:600">{{ w.passenger.passenger_name }}</td>
+            <td>{{ w.schedule.source_station.code }} → {{ w.schedule.dest_station.code }}</td>
+            <td>{{ w.schedule.travel_date.strftime('%d %b %Y') }}</td>
+            <td>{{ w.seat_type.replace('_',' ').title() }}</td>
+            <td style="color:var(--text-muted)">{{ w.request_time.strftime('%d %b, %H:%M') }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-center" style="color:var(--text-muted)">No one on the waitlist</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

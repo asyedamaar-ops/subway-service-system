@@ -1,0 +1,27 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Passengers — Admin{% endblock %}
+{% block admin_content %}
+<div class="section-title mb-1">Passengers</div>
+<div class="section-sub">{{ passengers|length }} registered passengers</div>
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Bookings</th></tr></thead>
+      <tbody>
+        {% for p in passengers %}
+          <tr>
+            <td>{{ p.passenger_id }}</td>
+            <td style="font-weight:600">{{ p.passenger_name }}</td>
+            <td style="color:var(--text-muted)">{{ p.user.email }}</td>
+            <td>{{ p.phone_no or '—' }}</td>
+            <td>{{ p.age or '—' }}</td>
+            <td><span class="status-badge status-confirmed">{{ p.bookings.count() }}</span></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-center" style="color:var(--text-muted)">No passengers yet</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

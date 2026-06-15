@@ -1,0 +1,47 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{% if metro %}Edit Metro{% else %}Add Metro{% endif %} — Admin{% endblock %}
+{% block admin_content %}
+<div class="section-title">{% if metro %}Edit Metro{% else %}Add Metro{% endif %}</div>
+<div class="section-sub">{% if metro %}Update metro details{% else %}Add a new metro line{% endif %}</div>
+<div class="card" style="max-width:600px">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-8">
+          <label class="form-label">Metro Name</label>
+          <input type="text" name="name" class="form-control" value="{{ metro.name if metro else '' }}" placeholder="Blue Line" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Metro Code</label>
+          <input type="text" name="metro_code" class="form-control" value="{{ metro.metro_code if metro else '' }}" placeholder="BL01" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Economy Seats</label>
+          <input type="number" name="economy_seats" class="form-control" value="{{ metro.economy_seats if metro else 100 }}" min="0">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Premium Seats</label>
+          <input type="number" name="premium_seats" class="form-control" value="{{ metro.premium_seats if metro else 60 }}" min="0">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Business Seats</label>
+          <input type="number" name="business_seats" class="form-control" value="{{ metro.business_seats if metro else 40 }}" min="0">
+        </div>
+        {% if metro %}
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
+                     {% if metro.is_active %}checked{% endif %} style="accent-color:var(--accent)">
+              <label class="form-check-label" for="is_active">Active</label>
+            </div>
+          </div>
+        {% endif %}
+        <div class="col-12 d-flex gap-3 mt-2">
+          <button type="submit" class="btn btn-primary">{% if metro %}Save Changes{% else %}Add Metro{% endif %}</button>
+          <a href="{{ url_for('admin.metros') }}" class="btn btn-outline-primary">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

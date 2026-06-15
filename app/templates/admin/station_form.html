@@ -1,0 +1,38 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{% if station %}Edit Station{% else %}Add Station{% endif %} — Admin{% endblock %}
+{% block admin_content %}
+<div class="section-title">{% if station %}Edit Station{% else %}Add Station{% endif %}</div>
+<div class="card" style="max-width:500px;margin-top:1rem">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-8">
+          <label class="form-label">Station Name</label>
+          <input type="text" name="name" class="form-control" value="{{ station.name if station else '' }}" placeholder="Chennai Central" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Code</label>
+          <input type="text" name="code" class="form-control" value="{{ station.code if station else '' }}" placeholder="CNL" required maxlength="10">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" class="form-control" value="{{ station.location if station else '' }}" placeholder="Park Town, Chennai">
+        </div>
+        {% if station %}
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
+                     {% if station.is_active %}checked{% endif %} style="accent-color:var(--accent)">
+              <label class="form-check-label" for="is_active">Active</label>
+            </div>
+          </div>
+        {% endif %}
+        <div class="col-12 d-flex gap-3 mt-2">
+          <button type="submit" class="btn btn-primary">{% if station %}Save{% else %}Add Station{% endif %}</button>
+          <a href="{{ url_for('admin.stations') }}" class="btn btn-outline-primary">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

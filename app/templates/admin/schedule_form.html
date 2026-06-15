@@ -1,0 +1,68 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Add Schedule — Admin{% endblock %}
+{% block admin_content %}
+<div class="section-title">Add Schedule</div>
+<div class="card" style="max-width:700px;margin-top:1rem">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Metro Line</label>
+          <select name="metro_id" class="form-select" required>
+            <option value="">Select Metro</option>
+            {% for m in metros %}
+              <option value="{{ m.metro_id }}">{{ m.name }} ({{ m.metro_code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Travel Date</label>
+          <input type="date" name="travel_date" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">From Station</label>
+          <select name="source_station_id" class="form-select" required>
+            <option value="">Select Station</option>
+            {% for s in stations %}
+              <option value="{{ s.station_id }}">{{ s.name }} ({{ s.code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">To Station</label>
+          <select name="dest_station_id" class="form-select" required>
+            <option value="">Select Station</option>
+            {% for s in stations %}
+              <option value="{{ s.station_id }}">{{ s.name }} ({{ s.code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Departure Time</label>
+          <input type="time" name="departure_time" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Arrival Time</label>
+          <input type="time" name="arrival_time" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Economy Fare (₹)</label>
+          <input type="number" name="economy_fare" class="form-control" value="100" min="0" step="0.01">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Premium Fare (₹)</label>
+          <input type="number" name="premium_fare" class="form-control" value="160" min="0" step="0.01">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Business Fare (₹)</label>
+          <input type="number" name="business_fare" class="form-control" value="240" min="0" step="0.01">
+        </div>
+        <div class="col-12 d-flex gap-3 mt-2">
+          <button type="submit" class="btn btn-primary">Add Schedule</button>
+          <a href="{{ url_for('admin.schedules') }}" class="btn btn-outline-primary">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}All Bookings — Admin{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <div class="section-title">All Bookings</div>
+    <div class="section-sub">{{ bookings|length }} total bookings</div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead>
+          <tr>
+            <th>Ticket No</th><th>Passenger</th><th>Route</th>
+            <th>Date</th><th>Class</th><th>Seat</th>
+            <th>Fare</th><th>Payment</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+            <tr>
+              <td style="color:var(--accent);font-weight:600">{{ b.ticket_no }}</td>
+              <td>{{ b.passenger.passenger_name }}</td>
+              <td>{{ b.schedule.source_station.code }} → {{ b.schedule.dest_station.code }}</td>
+              <td>{{ b.schedule.travel_date.strftime('%d %b %Y') }}</td>
+              <td>{{ b.seat_type.replace('_',' ').title() }}</td>
+              <td>{{ b.seat_number }}</td>
+              <td>₹{{ b.total_fare | int }}</td>
+              <td style="text-transform:uppercase;font-size:0.8rem">{{ b.payment_method }}</td>
+              <td><span class="status-badge status-{{ b.status.value }}">{{ b.status.value }}</span></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="9" class="text-center" style="color:var(--text-muted)">No bookings</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

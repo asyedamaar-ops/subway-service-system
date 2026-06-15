@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="row g-0" style="min-height:calc(100vh - 60px)">
+
+    <!-- SIDEBAR -->
+    <div class="col-md-2 admin-sidebar">
+      <div class="px-3 mb-3">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted)">
+          Admin Panel
+        </div>
+      </div>
+      <a href="{{ url_for('admin.dashboard') }}"
+         class="sidebar-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+        <span class="sidebar-icon">📊</span> Dashboard
+      </a>
+      <a href="{{ url_for('admin.metros') }}"
+         class="sidebar-item {% if 'metro' in request.endpoint %}active{% endif %}">
+        <span class="sidebar-icon">🚇</span> Metros
+      </a>
+      <a href="{{ url_for('admin.stations') }}"
+         class="sidebar-item {% if 'station' in request.endpoint %}active{% endif %}">
+        <span class="sidebar-icon">🚉</span> Stations
+      </a>
+      <a href="{{ url_for('admin.schedules') }}"
+         class="sidebar-item {% if 'schedule' in request.endpoint %}active{% endif %}">
+        <span class="sidebar-icon">📅</span> Schedules
+      </a>
+      <a href="{{ url_for('admin.bookings') }}"
+         class="sidebar-item {% if request.endpoint == 'admin.bookings' %}active{% endif %}">
+        <span class="sidebar-icon">🎫</span> Bookings
+      </a>
+      <a href="{{ url_for('admin.passengers') }}"
+         class="sidebar-item {% if request.endpoint == 'admin.passengers' %}active{% endif %}">
+        <span class="sidebar-icon">👥</span> Passengers
+      </a>
+      <a href="{{ url_for('admin.waitlist') }}"
+         class="sidebar-item {% if request.endpoint == 'admin.waitlist' %}active{% endif %}">
+        <span class="sidebar-icon">⏳</span> Waitlist
+      </a>
+      <div class="px-3 mt-4">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted)">
+          Navigation
+        </div>
+      </div>
+      <a href="{{ url_for('main.index') }}" class="sidebar-item">
+        <span class="sidebar-icon">🏠</span> Public Site
+      </a>
+      <a href="{{ url_for('auth.logout') }}" class="sidebar-item" style="color:var(--danger)">
+        <span class="sidebar-icon">🚪</span> Logout
+      </a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="col-md-10" style="background:var(--bg-dark)">
+      <div class="p-4">
+        {% block admin_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
