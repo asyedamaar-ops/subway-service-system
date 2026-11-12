@@ -1,93 +1,72 @@
 # Subway Service System
 
-A metro ticketing web app built for my DBMS course project at SRM. You can search for trains, book tickets, cancel them, and it handles waitlisting automatically when a train gets full.
+A metro ticketing web app built for the DBMS course at SRM. It lets passengers search trains, book tickets in three seat classes, cancel bookings, and join an automatic waitlist when a class is full. An admin panel manages metros, stations, schedules, bookings and the waitlist.
 
-## 🚇 Live Demo
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=flat-square&logo=flask&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 
-**[https://subway-service-system-production.up.railway.app](https://subway-service-system-production.up.railway.app)**
+> **Status:** the hosted demo has been taken down. The screenshots below come from a local run. Instructions to run it yourself are further down.
 
-| Role | Email | Password |
-|---|---|---|
-| Passenger | demo@passenger.com | demo123 |
-| Admin | admin@subway.com | admin123 |
+## My role
 
-## Available Routes
+Backend and database developer in a team of 3, with separate frontend and UI/UX developers. I designed the MySQL schema and wrote the Flask backend: authentication, role-based access, booking and cancellation, the waitlist logic and the admin module.
 
-| From | To | Line | Fare (Economy) |
-|---|---|---|---|
-| Chennai Central (CNL) | Airport (CAP) | Blue Line | ₹100 |
-| Airport (CAP) | Chennai Central (CNL) | Blue Line | ₹100 |
-| Egmore (EGM) | Koyambedu (KYB) | Green Line | ₹80 |
-| Koyambedu (KYB) | Egmore (EGM) | Green Line | ₹80 |
-| T. Nagar (TNG) | Anna Nagar (ANN) | Blue Line | ₹90 |
-| Anna Nagar (ANN) | T. Nagar (TNG) | Blue Line | ₹90 |
-| Chennai Central (CNL) | T. Nagar (TNG) | Blue Line | ₹75 |
-| T. Nagar (TNG) | Chennai Central (CNL) | Blue Line | ₹75 |
-| Chennai Central (CNL) | Guindy (GDY) | Blue Line | ₹85 |
-| Guindy (GDY) | Chennai Central (CNL) | Blue Line | ₹85 |
+## Screenshots
 
-Schedules run daily from **6:00 AM to 8:00 PM** with trains every 1-2 hours. All routes are available for the next 60 days from deployment.
+| Search results | Choose a class |
+|---|---|
+| ![Search](screenshots/02_search_results.png) | ![Select](screenshots/03_select_class.png) |
 
-## Seat Classes
+| Class full, so the passenger joins the waitlist | Admin waitlist view |
+|---|---|
+| ![Waitlist](screenshots/05_added_to_waitlist.png) | ![Admin](screenshots/06_admin_waitlist.png) |
 
-| Class | Multiplier | Example (CNL→CAP) |
-|---|---|---|
-| Economy | Base fare | ₹100 |
-| Premium Economy | 1.6x | ₹160 |
-| Business | 2.4x | ₹240 |
+After a confirmed booking on the same train is cancelled, the first waitlisted passenger is promoted automatically:
 
-## What it does
+![Promoted](screenshots/07_waitlist_promoted_after_cancel.png)
 
-- Search trains between stations on a given date
-- Book tickets (economy / premium / business class)
-- Mock payment (UPI, card, netbanking)
-- If train is full, you get added to waitlist automatically
-- When someone cancels, the first person on the waitlist gets the seat
-- Admin panel to manage everything
+## Features
 
-## Tech used
+- Search trains between two stations on a given date
+- Book Economy, Premium Economy or Business seats (fare multipliers 1.0x, 1.6x and 2.4x of the base fare)
+- Per-class seat availability for every schedule
+- Automatic waitlisting when a class is full, with first-in-first-out promotion when a booking is cancelled
+- Mock payment (UPI, card, net banking), with no real payment processing
+- Admin panel with CRUD for metros, stations and schedules, plus bookings, passengers and waitlist views
 
-- **Flask** (Python) for backend
-- **MySQL** for database — schema design, normalization, triggers etc. is the main point of this project
-- **SQLAlchemy** as ORM
-- **Bootstrap 5** + custom CSS for frontend
-- Flask-Login for auth
-- Deployed on **Railway**
+## Database
 
-## Database stuff
+- 8 tables: `user`, `passenger`, `metro`, `station`, `route`, `schedule`, `booking`, `waitlist`
+- 3 views in `schema.sql`: booking details, revenue by metro and seat availability
+- 2 SQL triggers in `schema.sql`: a fare check before a booking insert, and waitlist promotion after a cancellation
+- Waitlist **joining** is handled in the Flask code. The deployed app created its tables through SQLAlchemy, so waitlist promotion ran in the application code (`_trigger_promote_waitlist`) and not through the SQL trigger. Use one path or the other, not both, or a cancellation could promote two passengers.
+- Seed data: 2 lines (Blue and Green), 8 stations, 9 directional routes and 2,580 daily schedules over 60 days. The seed tops itself up on each start.
 
-This was the main focus of the project. The schema has 7 tables:
+## Tech stack
 
-`user` → `passenger` (1-to-1), `metro`, `station`, `schedule`, `route`, `booking`, `waitlist`
+Flask, SQLAlchemy, Flask-Login, PyMySQL, MySQL, Bootstrap 5.
 
-All tables are normalized to 3NF/BCNF. The project report covers the full ER diagram, relational schema, normalization proof, and complex SQL queries.
+## Run it locally
 
-There are 3 triggers:
-1. Validates fare is not negative before insert
-2. Auto-adds to waitlist when booking is attempted on a full train
-3. Promotes waitlist when a booking is cancelled
-
-There are also 3 views for common queries (booking details, revenue by metro, seat availability).
-
-## How to run locally
-
-You need Python 3.10+ and MySQL installed.
+You need Python 3.10+ and MySQL.
 
 ```bash
 git clone https://github.com/asyedamaar-ops/subway-service-system
 cd subway-service-system
 pip install -r requirements.txt
-cp .env.example .env
-# edit .env with your MySQL password
+cp .env.example .env     # set DB_USER and DB_PASSWORD for your MySQL
+# create an empty database first: CREATE DATABASE subway_system;
 python run.py
 ```
 
-Open `http://localhost:5000`
+On first start `run.py` creates the tables and seeds demo data. Open http://localhost:5000. The seed creates a demo passenger and an admin account. Their login details are in `run.py`. Change them before deploying anywhere public.
 
-## Known issues / things i'd improve
+## Known limitations
 
-- Payment is completely fake, just stores whatever method you pick
-- Seat numbers are randomly assigned, not an actual seat map
-- No email confirmation after booking
-- Mobile layout could be better on very small screens
-- Would add more routes and stations in a real version
+- Payment is a mock and only stores the chosen method
+- Seat numbers are assigned randomly, with no seat map
+- No email confirmation
+- It runs on the Flask development server (`python run.py`). A production setup would use gunicorn behind a proper host
+- The secret key falls back to a development value if `SECRET_KEY` is not set
+- Passwords for the seeded demo accounts are fixed in the seed script
