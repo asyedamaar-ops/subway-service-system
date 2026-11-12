@@ -16,15 +16,15 @@ Backend and database developer in a team of 3, with separate frontend and UI/UX 
 
 | Search results | Choose a class |
 |---|---|
-| ![Search](screenshots/02_search_results.png) | ![Select](screenshots/03_select_class.png) |
+| ![Search](02_search_results.png) | ![Select](03_select_class.png) |
 
 | Class full, so the passenger joins the waitlist | Admin waitlist view |
 |---|---|
-| ![Waitlist](screenshots/05_added_to_waitlist.png) | ![Admin](screenshots/06_admin_waitlist.png) |
+| ![Waitlist](05_added_to_waitlist.png) | ![Admin](06_admin_waitlist.png) |
 
 After a confirmed booking on the same train is cancelled, the first waitlisted passenger is promoted automatically:
 
-![Promoted](screenshots/07_waitlist_promoted_after_cancel.png)
+![Promoted](07_waitlist_promoted_after_cancel.png)
 
 ## Features
 
