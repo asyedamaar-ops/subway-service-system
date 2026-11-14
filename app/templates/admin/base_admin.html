@@ -46,9 +46,12 @@
       <a href="{{ url_for('main.index') }}" class="sidebar-item">
         <span class="sidebar-icon">🏠</span> Public Site
       </a>
-      <a href="{{ url_for('auth.logout') }}" class="sidebar-item" style="color:var(--danger)">
-        <span class="sidebar-icon">🚪</span> Logout
-      </a>
+      <form method="POST" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="sidebar-item" style="color:var(--danger);background:none;border-top:0;border-right:0;border-bottom:0;width:100%;text-align:left">
+          <span class="sidebar-icon">🚪</span> Logout
+        </button>
+      </form>
     </div>
 
     <!-- MAIN CONTENT -->

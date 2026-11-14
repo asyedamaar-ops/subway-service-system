@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app import db
 from app.models import Metro, Station, Schedule, Booking, Waitlist, Passenger, User, BookingStatus
-from datetime import date, datetime
+from datetime import datetime
 from functools import wraps
 from sqlalchemy import func
 
@@ -71,7 +71,7 @@ def add_metro():
 @login_required
 @admin_required
 def edit_metro(metro_id):
-    metro = Metro.query.get_or_404(metro_id)
+    metro = db.get_or_404(Metro, metro_id)
     if request.method == 'POST':
         metro.name = request.form['name']
         metro.metro_code = request.form['metro_code']
@@ -115,7 +115,7 @@ def add_station():
 @login_required
 @admin_required
 def edit_station(station_id):
-    station = Station.query.get_or_404(station_id)
+    station = db.get_or_404(Station, station_id)
     if request.method == 'POST':
         station.name = request.form['name']
         station.code = request.form['code'].upper()
@@ -158,8 +158,9 @@ def add_schedule():
             db.session.commit()
             flash('Schedule added.', 'success')
             return redirect(url_for('admin.schedules'))
-        except Exception as e:
-            flash(f'Something went wrong: {e}', 'danger')
+        except (KeyError, ValueError):
+            db.session.rollback()
+            flash('Please fill in every field with a valid value.', 'danger')
     return render_template('admin/schedule_form.html', metros=metros, stations=stations, schedule=None)
 
 

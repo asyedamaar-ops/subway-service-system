@@ -49,6 +49,7 @@
         <div class="section-title">Complete Payment</div>
         <div class="section-sub">Secure payment powered by SubwaySSC</div>
         <form method="POST">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="card mb-4">
             <div class="card-header"><div class="card-title mb-0">Choose Payment Method</div></div>
             <div class="card-body">

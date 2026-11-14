@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — SubwaySSC{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="container" style="max-width:640px">
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <div style="font-size:3rem;font-weight:900;color:var(--accent)">{{ code }}</div>
+        <div class="section-title">{{ title }}</div>
+        <div class="section-sub mb-4">{{ message }}</div>
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

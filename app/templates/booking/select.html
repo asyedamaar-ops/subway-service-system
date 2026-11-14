@@ -50,7 +50,7 @@
               <div class="seat-fare">₹{{ st.fare | int }}</div>
               <div class="seat-avail">{{ st.avail }} seats available</div>
               <div class="avail-bar">
-                {% set pct = [(st.avail / 100 * 100)|int, 100]|min %}
+                {% set pct = (st.avail / st.capacity * 100)|int if st.capacity else 0 %}
                 <div class="avail-fill" style="width:{{ pct }}%"></div>
               </div>
               {% if st.avail > 0 %}
