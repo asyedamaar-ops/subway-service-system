@@ -68,6 +68,7 @@
                 {% if b.status.value == 'confirmed' %}
                   <form method="POST" action="{{ url_for('booking.cancel', booking_id=b.booking_id) }}"
                         onsubmit="return confirm('Cancel this booking?')">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                   </form>
                 {% endif %}

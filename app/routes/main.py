@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from app.models import Schedule, Station, Metro
-from datetime import date, datetime
+from datetime import datetime
+
+from app.clock import local_now, local_today
 
 main_bp = Blueprint('main', __name__)
 
@@ -11,7 +13,7 @@ def index():
     total_metros = Metro.query.count()
     total_stations = Station.query.count()
     # only count upcoming schedules
-    total_schedules = Schedule.query.filter(Schedule.travel_date >= date.today()).count()
+    total_schedules = Schedule.query.filter(Schedule.travel_date >= local_today()).count()
     return render_template('main/index.html',
                            stations=stations,
                            total_metros=total_metros,
@@ -36,7 +38,10 @@ def search():
                 dest_station_id=dest_id,
                 travel_date=travel_date,
                 is_active=True
-            ).all()
+            ).order_by(Schedule.departure_time).all()
+            # trains that have already left are not offered
+            now = local_now()
+            schedules = [s for s in schedules if s.is_bookable(now)]
         except ValueError:
             pass  # bad date format, just show empty results
 

@@ -1,6 +1,11 @@
 -- ═══════════════════════════════════════════════════════════════
 --  SUBWAY SERVICE SYSTEM — MySQL Schema
 --  3NF/BCNF Normalized · Triggers Included
+--
+--  Raw SQL version of the schema in app/models.py. The Flask app can
+--  create the same tables itself (python run.py), so loading this file
+--  is optional. Its triggers only reject bad data. They never book or
+--  promote anybody, so they are safe to use together with the app.
 -- ═══════════════════════════════════════════════════════════════
 
 CREATE DATABASE IF NOT EXISTS subway_system;
@@ -55,7 +60,9 @@ CREATE TABLE schedule (
     FOREIGN KEY (metro_id)          REFERENCES metro(metro_id),
     FOREIGN KEY (source_station_id) REFERENCES station(station_id),
     FOREIGN KEY (dest_station_id)   REFERENCES station(station_id),
-    CHECK (source_station_id <> dest_station_id)
+    CHECK (source_station_id <> dest_station_id),
+    -- the search page filters on exactly these three columns
+    INDEX ix_schedule_search (source_station_id, dest_station_id, travel_date)
 );
 
 -- ── ROUTE ─────────────────────────────────────────────────────
@@ -93,9 +100,16 @@ CREATE TABLE booking (
     status         ENUM('confirmed','cancelled','waitlisted') NOT NULL DEFAULT 'confirmed',
     payment_method VARCHAR(20),
     transaction_id VARCHAR(50),
+    -- seat number while the booking is confirmed, NULL once it is cancelled
+    active_seat    VARCHAR(10) GENERATED ALWAYS AS
+                   (CASE WHEN status = 'confirmed' THEN seat_number ELSE NULL END) STORED,
     FOREIGN KEY (passenger_id) REFERENCES passenger(passenger_id),
     FOREIGN KEY (schedule_id)  REFERENCES schedule(schedule_id),
-    CHECK (total_fare >= 0)
+    CHECK (total_fare >= 0),
+    -- one confirmed booking per seat on a train. A unique index ignores NULLs,
+    -- so a cancelled booking frees its seat.
+    UNIQUE KEY uq_booking_active_seat (schedule_id, active_seat),
+    INDEX ix_booking_schedule_class_status (schedule_id, seat_type, status)
 );
 
 -- ── WAITLIST ──────────────────────────────────────────────────
@@ -107,7 +121,10 @@ CREATE TABLE waitlist (
     seat_type    VARCHAR(30) NOT NULL,
     position     INT NOT NULL,
     FOREIGN KEY (passenger_id) REFERENCES passenger(passenger_id),
-    FOREIGN KEY (schedule_id)  REFERENCES schedule(schedule_id)
+    FOREIGN KEY (schedule_id)  REFERENCES schedule(schedule_id),
+    -- a passenger can wait only once for the same train and class
+    UNIQUE KEY uq_waitlist_entry (passenger_id, schedule_id, seat_type),
+    INDEX ix_waitlist_queue (schedule_id, seat_type, position)
 );
 
 -- ═══════════════════════════════════════════════════════════════
@@ -116,7 +133,7 @@ CREATE TABLE waitlist (
 
 DELIMITER $$
 
--- TRIGGER 1: Validate seat_number > 0 before insert
+-- TRIGGER 1: a booking can never be stored with a negative fare
 CREATE TRIGGER before_booking_insert
 BEFORE INSERT ON booking
 FOR EACH ROW
@@ -127,39 +144,24 @@ BEGIN
     END IF;
 END$$
 
--- TRIGGER 2: Auto-add to waitlist if booking is made when seat is full
--- (Handled at application level via _trigger_add_to_waitlist function)
-
--- TRIGGER 3: Promote waitlist when booking is cancelled
-CREATE TRIGGER after_booking_cancel
-AFTER UPDATE ON booking
+-- TRIGGER 2: a cancelled booking is final. It cannot be switched back to
+-- confirmed, which would take a seat that may already be sold again.
+CREATE TRIGGER before_booking_update
+BEFORE UPDATE ON booking
 FOR EACH ROW
 BEGIN
-    DECLARE wl_passenger INT;
-    DECLARE new_ticket VARCHAR(30);
-
-    IF OLD.status = 'confirmed' AND NEW.status = 'cancelled' THEN
-        SELECT passenger_id INTO wl_passenger
-        FROM waitlist
-        WHERE schedule_id = OLD.schedule_id AND seat_type = OLD.seat_type
-        ORDER BY position ASC
-        LIMIT 1;
-
-        IF wl_passenger IS NOT NULL THEN
-            SET new_ticket = CONCAT('WL-', FLOOR(RAND() * 9000000 + 1000000));
-            INSERT INTO booking (passenger_id, schedule_id, ticket_no, seat_type,
-                                 seat_number, total_fare, status, payment_method)
-            SELECT wl_passenger, OLD.schedule_id, new_ticket, OLD.seat_type,
-                   OLD.seat_number, total_fare, 'confirmed', 'waitlist_promoted'
-            FROM booking WHERE booking_id = OLD.booking_id;
-
-            DELETE FROM waitlist
-            WHERE schedule_id = OLD.schedule_id
-              AND passenger_id = wl_passenger
-              AND seat_type = OLD.seat_type;
-        END IF;
+    IF OLD.status = 'cancelled' AND NEW.status <> 'cancelled' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'A cancelled booking cannot be reactivated.';
     END IF;
 END$$
+
+-- Waitlist joining and waitlist promotion are NOT triggers. They run in the
+-- application as one transaction (app/services/booking.py).
+-- An earlier version promoted the waitlist from an AFTER UPDATE trigger on
+-- booking. MySQL does not allow a trigger to insert into the table that fired
+-- it (error 1442), so that trigger made every cancellation fail as soon as
+-- somebody was waiting. It was removed.
 
 DELIMITER ;
 

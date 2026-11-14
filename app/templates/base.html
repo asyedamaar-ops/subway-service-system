@@ -41,7 +41,12 @@
             <ul class="dropdown-menu dropdown-menu-end" style="background:var(--bg-card);border-color:var(--border)">
               <li><a class="dropdown-item" style="color:var(--text-primary)" href="{{ url_for('auth.profile') }}">Profile</a></li>
               <li><hr class="dropdown-divider" style="border-color:var(--border)"></li>
-              <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">Logout</a></li>
+              <li>
+                <form method="POST" action="{{ url_for('auth.logout') }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="dropdown-item text-danger">Logout</button>
+                </form>
+              </li>
             </ul>
           </li>
         {% else %}
